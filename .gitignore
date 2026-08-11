@@ -427,3 +427,16 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Loại bỏ thư mục cấu hình IDE
+.antigravity-ide/
+.vscode/
+.idea/
+
+# Loại bỏ các file tạm của Office
+~$*.docx
+~$*.pptx
+
+# Loại bỏ file hệ thống
+.DS_Store
+Thumbs.db
