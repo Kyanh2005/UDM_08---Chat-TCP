@@ -4,7 +4,7 @@ namespace ChatApp.Shared.Models
     {
         CONNECT = 1,
         DISCONNECT = 2,
-        CHAT_TEST = 3,
+        CHAT_TEXT = 3,
         CHAT_REPLY = 4,
         CHAT_FORWARD = 5,
         UPDATE_AVATAR = 6,
