@@ -161,7 +161,7 @@ namespace ChatApp.Server.Network
                     // BƯỚC 5: Đưa gói tin hợp lệ vào MessageRouter để phân luồng (Broadcast / Unicast / ...)
                     if (message != null)
                     {
-                        await _router.RouteMessageAsync(session, message);
+                        await _router.RouterMessageAsync(session, message);
                     }
                 }
             }
