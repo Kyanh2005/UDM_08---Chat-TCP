@@ -30,7 +30,7 @@ namespace ChatApp.Server.Network
         private bool _isRunning;
         private readonly CancellationTokenSource _cts = new();
 
-        public ConcurrentDictionary<string, ClientSession> Session => _session;
+        public ConcurrentDictionary<string, ClientSession> Session => _sessions;
         public TcpServerListener(IPAddress ipAddress, int port, int maxMessageLength = 5000, int maxAvatarSizeKB = 50)
         {
             _listener = new TcpListener(ipAddress, port);
@@ -49,32 +49,33 @@ namespace ChatApp.Server.Network
                 _listener.Start();
                 _isRunning = true;
                 ServerLogger.LogSuccess($"Server is listening on {_listener.LocalEndpoint}");
-            }
             
             
-            while (_isRunning && !_cts.IsCancellationRequested)
-            {
-                try
+            
+                while (_isRunning && !_cts.IsCancellationRequested)
                 {
-                    var tcpClient = await _listener.AcceptTcpClientAsync(_cts.Token);
+                    try
+                    {
+                        var tcpClient = await _listener.AcceptTcpClientAsync(_cts.Token);
 
-                    _ = Task.Run(() => HandleClientAsync(Client, _cts.Token));
+                        _ = Task.Run(() => HandleClientAsync(tcpClient, _cts.Token));
+                    }
+            
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_isRunning)
+                        {
+                            ServerLogger.LogError($"AcceptClient Error: {ex.Message}");
+                        }
+                    }
                 }
             }
-            catch (ObjectionCanceledException)
+            finally
             {
-                break;
-            }
-            catch (Exception ex)
-            {
-                if (_isRunning)
-                {
-                ServerLogger.LogError($"AcceptClient Error: {ex.Message}");
-                }
-            }
-        }
-        finally
-        {
             Stop();
         }
     }
@@ -203,7 +204,7 @@ namespace ChatApp.Server.Network
         while (totalBytesRead < count)
         {
             int bytesRead = await stream.ReadAsync(buffer.AsMemory(offset + totalBytesRead, count - totalBytesRead), token);
-            if (bytesRead === 0)
+            if (bytesRead == 0)
             {
                 return false; // Socket đã bị ngắt từ phía đối phương
             }
@@ -237,4 +238,5 @@ namespace ChatApp.Server.Network
             ServerLogger.LogError($"Error while stopping server: {ex.Message}");
         }
     }
+}
 }
