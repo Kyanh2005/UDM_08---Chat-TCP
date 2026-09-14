@@ -30,8 +30,7 @@ partial class Form1
         this.btnAvatar = new System.Windows.Forms.Button();
         this.lblStatus = new System.Windows.Forms.Label();
         this.pnlLeftSidebar = new System.Windows.Forms.Panel();
-        this.lstContacts = new System.Windows.Forms.ListBox();
-        this.lblContactHeader = new System.Windows.Forms.Label();
+        this.ucContacts = new ChatApp.Client.UI.Controls.ucContactList();
         this.chatBox = new ChatApp.Client.UI.ChatBoxUserControl();
         this.pnlTopBar.SuspendLayout();
         this.pnlLeftSidebar.SuspendLayout();
@@ -179,48 +178,28 @@ partial class Form1
         // pnlLeftSidebar
         // 
         this.pnlLeftSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
-        this.pnlLeftSidebar.Controls.Add(this.lstContacts);
-        this.pnlLeftSidebar.Controls.Add(this.lblContactHeader);
+        this.pnlLeftSidebar.Controls.Add(this.ucContacts);
         this.pnlLeftSidebar.Dock = System.Windows.Forms.DockStyle.Left;
         this.pnlLeftSidebar.Location = new System.Drawing.Point(0, 60);
         this.pnlLeftSidebar.Name = "pnlLeftSidebar";
-        this.pnlLeftSidebar.Size = new System.Drawing.Size(250, 590);
+        this.pnlLeftSidebar.Size = new System.Drawing.Size(260, 590);
         this.pnlLeftSidebar.TabIndex = 1;
         // 
-        // lstContacts
+        // ucContacts
         // 
-        this.lstContacts.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
-        this.lstContacts.BorderStyle = System.Windows.Forms.BorderStyle.None;
-        this.lstContacts.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.lstContacts.Font = new System.Drawing.Font("Segoe UI", 10.5F);
-        this.lstContacts.FormattingEnabled = true;
-        this.lstContacts.ItemHeight = 23;
-        this.lstContacts.Location = new System.Drawing.Point(0, 45);
-        this.lstContacts.Name = "lstContacts";
-        this.lstContacts.Size = new System.Drawing.Size(250, 545);
-        this.lstContacts.TabIndex = 1;
-        // 
-        // lblContactHeader
-        // 
-        this.lblContactHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(232)))), ((int)(((byte)(240)))));
-        this.lblContactHeader.Dock = System.Windows.Forms.DockStyle.Top;
-        this.lblContactHeader.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-        this.lblContactHeader.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-        this.lblContactHeader.Location = new System.Drawing.Point(0, 0);
-        this.lblContactHeader.Name = "lblContactHeader";
-        this.lblContactHeader.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-        this.lblContactHeader.Size = new System.Drawing.Size(250, 45);
-        this.lblContactHeader.TabIndex = 0;
-        this.lblContactHeader.Text = "ONLINE USERS [0]";
-        this.lblContactHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        this.ucContacts.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.ucContacts.Location = new System.Drawing.Point(0, 0);
+        this.ucContacts.Name = "ucContacts";
+        this.ucContacts.Size = new System.Drawing.Size(260, 590);
+        this.ucContacts.TabIndex = 0;
         // 
         // chatBox
         // 
         this.chatBox.BackColor = System.Drawing.Color.White;
         this.chatBox.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.chatBox.Location = new System.Drawing.Point(250, 60);
+        this.chatBox.Location = new System.Drawing.Point(260, 60);
         this.chatBox.Name = "chatBox";
-        this.chatBox.Size = new System.Drawing.Size(830, 590);
+        this.chatBox.Size = new System.Drawing.Size(820, 590);
         this.chatBox.TabIndex = 2;
         // 
         // Form1
@@ -256,7 +235,6 @@ partial class Form1
     private System.Windows.Forms.Button btnAvatar;
     private System.Windows.Forms.Label lblStatus;
     private System.Windows.Forms.Panel pnlLeftSidebar;
-    private System.Windows.Forms.ListBox lstContacts;
-    private System.Windows.Forms.Label lblContactHeader;
+    private ChatApp.Client.UI.Controls.ucContactList ucContacts;
     private ChatApp.Client.UI.ChatBoxUserControl chatBox;
 }

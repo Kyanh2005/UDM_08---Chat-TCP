@@ -28,14 +28,16 @@ namespace ChatApp.Server.Services
                 return false;
             }
 
-            if (message.Type == MessageType.CHAT_REPLY && string.IsNullOrWhiteSpace(message.ReplyToMessageId))
+            if (!string.IsNullOrWhiteSpace(message.ReceiverUsername))
             {
-                errorMessage = $"{ErrorCode}: ReplyToMessageId is required for CHAT_REPLY";
-                return false;
+                if (!ValidateReceiver(message.ReceiverUsername, username, out errorMessage))
+                {
+                    return false;
+                }
             }
-            if (message.Type == MessageType.CHAT_FORWARD && string.IsNullOrWhiteSpace(message.ForwardFromUser))
+
+            if (!ValidateSpecialMessageFields(message, out errorMessage))
             {
-                errorMessage = $"{ErrorCode}: ForwardFromUser is required for CHAT_FORWARD";
                 return false;
             }
 

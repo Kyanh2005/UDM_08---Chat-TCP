@@ -32,8 +32,6 @@ namespace ChatApp.Client
         private void InitializeDefaultValues()
         {
             txtUsername.Text = "User_" + new Random().Next(100, 999);
-            lstContacts.Items.Add("📢 PHÒNG CHUNG (ALL)");
-            lstContacts.SelectedIndex = 0;
             chatBox.SetChatTitle("💬 Phòng chat chung (ALL)");
         }
 
@@ -42,7 +40,20 @@ namespace ChatApp.Client
             btnConnect.Click += async (s, e) => await ConnectToServerAsync();
             btnDisconnect.Click += (s, e) => DisconnectFromServer();
             btnAvatar.Click += async (s, e) => await UploadAvatarAsync();
-            lstContacts.SelectedIndexChanged += LstContacts_SelectedIndexChanged;
+            
+            // Lắng nghe sự kiện chọn người dùng từ ucContactList (Member 4)
+            ucContacts.ContactSelected += (s, targetUser) =>
+            {
+                _selectedReceiver = targetUser;
+                if (targetUser == "ALL")
+                {
+                    chatBox.SetChatTitle("💬 Phòng chat chung (ALL)");
+                }
+                else
+                {
+                    chatBox.SetChatTitle($"🔒 Đang chat riêng với: {targetUser}");
+                }
+            };
 
             chatBox.MessageSent += async (s, msg) => await SendChatMessageAsync(msg);
             chatBox.ForwardRequested += async (s, msg) => await HandleForwardMessageAsync(msg);
@@ -70,6 +81,7 @@ namespace ChatApp.Client
             }
 
             _myUsername = username;
+            ucContacts.SetMyUsername(_myUsername);
             btnConnect.Enabled = false;
             lblStatus.Text = "🟡 Đang kết nối...";
             lblStatus.ForeColor = Color.Orange;
@@ -138,10 +150,7 @@ namespace ChatApp.Client
             txtUsername.Enabled = true;
 
             _onlineUsers.Clear();
-            lstContacts.Items.Clear();
-            lstContacts.Items.Add("📢 PHÒNG CHUNG (ALL)");
-            lstContacts.SelectedIndex = 0;
-            lblContactHeader.Text = "ONLINE USERS [0]";
+            ucContacts.ClearUsers();
         }
 
         private void ClientService_OnMessageReceived(ChatMessage message)
@@ -195,7 +204,7 @@ namespace ChatApp.Client
                 {
                     _onlineUsers.Clear();
                     _onlineUsers.AddRange(users);
-                    RefreshContactListBox();
+                    ucContacts.SetOnlineUsers(_onlineUsers, _myUsername);
                 }
             }
             catch { }
@@ -206,14 +215,14 @@ namespace ChatApp.Client
             if (!_onlineUsers.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
             {
                 _onlineUsers.Add(new User { Username = username, DisplayName = username, AvatarBase64 = avatarBase64, IsOnline = true });
-                RefreshContactListBox();
+                ucContacts.AddOrUpdateUser(username, avatarBase64, true);
             }
         }
 
         private void RemoveOnlineUser(string username)
         {
             _onlineUsers.RemoveAll(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-            RefreshContactListBox();
+            ucContacts.RemoveUser(username);
         }
 
         private void UpdateUserAvatar(string username, string? avatarBase64)
@@ -223,52 +232,7 @@ namespace ChatApp.Client
             {
                 user.AvatarBase64 = avatarBase64;
             }
-        }
-
-        private void RefreshContactListBox()
-        {
-            string currentSelected = _selectedReceiver;
-
-            lstContacts.Items.Clear();
-            lstContacts.Items.Add("📢 PHÒNG CHUNG (ALL)");
-
-            foreach (var user in _onlineUsers.Where(u => !u.Username.Equals(_myUsername, StringComparison.OrdinalIgnoreCase)))
-            {
-                lstContacts.Items.Add($"🟢 {user.Username}");
-            }
-
-            lblContactHeader.Text = $"ONLINE USERS [{_onlineUsers.Count}]";
-
-            // Khôi phục lựa chọn
-            int foundIndex = 0;
-            if (currentSelected != "ALL")
-            {
-                for (int i = 1; i < lstContacts.Items.Count; i++)
-                {
-                    if (lstContacts.Items[i].ToString()?.EndsWith(currentSelected) == true)
-                    {
-                        foundIndex = i;
-                        break;
-                    }
-                }
-            }
-            lstContacts.SelectedIndex = foundIndex;
-        }
-
-        private void LstContacts_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (lstContacts.SelectedIndex <= 0)
-            {
-                _selectedReceiver = "ALL";
-                chatBox.SetChatTitle("💬 Phòng chat chung (ALL)");
-            }
-            else
-            {
-                string raw = lstContacts.SelectedItem?.ToString() ?? "";
-                string target = raw.Replace("🟢", "").Trim();
-                _selectedReceiver = target;
-                chatBox.SetChatTitle($"🔒 Đang chat riêng với: {target}");
-            }
+            ucContacts.UpdateUserAvatar(username, avatarBase64);
         }
 
         private async Task SendChatMessageAsync(ChatMessage message)
