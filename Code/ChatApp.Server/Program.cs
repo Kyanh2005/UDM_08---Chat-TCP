@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Net;
 using ChatApp.Server.Network;
 using ChatApp.Server.Services;
 
@@ -33,8 +34,8 @@ namespace ChatApp.Server
             ");
             Console.ResetColor();
 
-            // 1. Đọc cấu hình từ file App.config (Nếu không có thì dùng giá trị mặc định)
-            string ipAddress = ConfigurationManager.AppSettings["ServerIP"] ?? "127.0.0.1";
+            // 1. Đọc cấu hình từ file App.config (Mặc định 0.0.0.0 để chấp nhận cả mạng LAN)
+            string ipAddress = ConfigurationManager.AppSettings["ServerIP"] ?? "0.0.0.0";
             int port = 5000;
             int maxMessageLength = 5000;
             int maxAvatarSizeKB = 50;
@@ -70,7 +71,11 @@ namespace ChatApp.Server
             ServerLogger.LogInfo("Starting TCP Server Core...");
 
             // 4. Khởi tạo đối tượng TcpServerListener để bắt đầu mở cổng lắng nghe kết nối
-            var server = new TcpServerListener(ipAddress, port, maxMessageLength, maxAvatarSizeKB);
+            if (!IPAddress.TryParse(ipAddress, out IPAddress? parsedIp))
+            {
+                parsedIp = IPAddress.Any;
+            }
+            var server = new TcpServerListener(parsedIp, port, maxMessageLength, maxAvatarSizeKB);
 
             // 5. Bắt sự kiện bấm Ctrl+C để tắt Server an toàn (giải phóng toàn bộ socket trước khi thoát)
             Console.CancelKeyPress += (s, e) =>
