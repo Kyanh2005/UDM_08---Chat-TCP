@@ -54,6 +54,10 @@ namespace ChatApp.Server.Services
         {
             if (string.IsNullOrEmpty(input)) return string.Empty;
 
+            // Lọc mật khẩu / dữ liệu nhạy cảm bằng Regex theo yêu cầu đề bài Mem 2
+            input = Regex.Replace(input, @"(password|passwd|pwd|token|secret|pin)\s*[:=]\s*[""']?(\S+)[""']?", 
+                "$1: ***", RegexOptions.IgnoreCase);
+
             if (input.Length > 200)
             {
                 return input.Substring(0, 200) + "... [TRUNCATED - DỮ LIỆU DÀI ĐÃ ĐƯỢC RÚT GỌN]";

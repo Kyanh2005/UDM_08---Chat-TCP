@@ -1,43 +1,162 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace ChatApp.Client.UI.Controls
 {
     /// <summary>
-    /// [GIAI ĐOẠN 1] UserControl rỗng - Member 5
-    /// Emoji Picker (sẽ hoàn thiện ở giai đoạn 3)
+    /// UserControl Emoji Picker - Member 5
+    /// Popup chọn emoji Unicode để chèn vào TextBox
     /// </summary>
     public partial class ucEmojiPicker : UserControl
     {
+        // Event khi chọn emoji
+        public event EventHandler<string>? EmojiSelected;
+
+        private FlowLayoutPanel flowPanel;
+
+        // Danh sách emoji phổ biến
+        private readonly string[] _emojis = new string[]
+        {
+            // Mặt cười
+            "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂",
+            "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩",
+            "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪",
+            "😝", "🤑", "🤗", "🤭", "🤫", "🤔", "🤐", "🤨",
+            
+            // Cảm xúc
+            "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "🤥",
+            "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕",
+            "🤢", "🤮", "🤧", "🥵", "🥶", "😵", "🤯", "🤠",
+            "🥳", "😎", "🤓", "🧐", "😕", "😟", "🙁", "😮",
+            
+            // Cử chỉ tay
+            "👍", "👎", "👌", "✌", "🤞", "🤟", "🤘", "🤙",
+            "👈", "👉", "👆", "👇", "☝", "✋", "🤚", "🖐",
+            "🖖", "👋", "🤝", "💪", "🙏", "✍", "💅", "🤳",
+            
+            // Tim và biểu tượng
+            "❤", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍",
+            "💔", "❣", "💕", "💞", "💓", "💗", "💖", "💘",
+            "💝", "💟", "☮", "✝", "☪", "🕉", "☸", "✡",
+            
+            // Động vật
+            "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼",
+            "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🐔",
+            "🐧", "🐦", "🐤", "🦆", "🦅", "🦉", "🦇", "🐺",
+            
+            // Thức ăn
+            "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇",
+            "🍓", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝",
+            "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶", "🌽",
+            "🍔", "🍟", "🍕", "🌭", "🥪", "🌮", "🌯", "🥙",
+            
+            // Hoạt động
+            "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉",
+            "🥏", "🎱", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏",
+            "⛳", "🏹", "🎣", "🥊", "🥋", "🎽", "⛸", "🥌"
+        };
+
         public ucEmojiPicker()
         {
             InitializeComponent();
-            SetupEmptyUI();
+            SetupUI();
+            LoadEmojis();
         }
 
-        private void SetupEmptyUI()
+        private void SetupUI()
         {
-            // Placeholder cho giai đoạn 1
-            this.BackColor = System.Drawing.Color.LightYellow;
-            this.Size = new System.Drawing.Size(300, 200);
+            this.Size = new Size(320, 280);
+            this.BackColor = Color.White;
             this.BorderStyle = BorderStyle.FixedSingle;
+            this.AutoScroll = false;
 
-            Label lblPlaceholder = new Label
+            // Header
+            Panel pnlHeader = new Panel
             {
-                Text = "[ucEmojiPicker] - Member 5\n😀 Emoji Picker\nChờ giai đoạn 3 để hoàn thiện",
-                Dock = DockStyle.Fill,
-                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Italic)
+                Dock = DockStyle.Top,
+                Height = 35,
+                BackColor = Color.FromArgb(245, 245, 245)
             };
 
-            this.Controls.Add(lblPlaceholder);
+            Label lblTitle = new Label
+            {
+                Text = "😊 Chọn Emoji",
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
+
+            Button btnClose = new Button
+            {
+                Text = "✕",
+                Dock = DockStyle.Right,
+                Width = 35,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10),
+                Cursor = Cursors.Hand
+            };
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnClose.Click += (s, e) => this.Visible = false;
+
+            pnlHeader.Controls.Add(lblTitle);
+            pnlHeader.Controls.Add(btnClose);
+
+            // Flow Panel chứa emoji
+            flowPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Padding = new Padding(5),
+                WrapContents = true
+            };
+
+            this.Controls.Add(flowPanel);
+            this.Controls.Add(pnlHeader);
         }
 
-        private void InitializeComponent()
+        private void LoadEmojis()
         {
-            this.SuspendLayout();
-            this.Name = "ucEmojiPicker";
-            this.ResumeLayout(false);
+            foreach (string emoji in _emojis)
+            {
+                Button btnEmoji = new Button
+                {
+                    Text = emoji,
+                    Size = new Size(35, 35),
+                    Font = new Font("Segoe UI Emoji", 16),
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand,
+                    Margin = new Padding(2),
+                    Tag = emoji
+                };
+
+                btnEmoji.FlatAppearance.BorderSize = 0;
+                btnEmoji.FlatAppearance.MouseOverBackColor = Color.FromArgb(230, 230, 230);
+
+                btnEmoji.Click += (s, e) =>
+                {
+                    string selectedEmoji = ((Button)s!).Tag.ToString()!;
+                    EmojiSelected?.Invoke(this, selectedEmoji);
+                    this.Visible = false; // Đóng popup sau khi chọn
+                };
+
+                // Tooltip
+                ToolTip tooltip = new ToolTip();
+                tooltip.SetToolTip(btnEmoji, emoji);
+
+                flowPanel.Controls.Add(btnEmoji);
+            }
+        }
+
+        /// <summary>
+        /// Hiển thị Emoji Picker tại vị trí cụ thể
+        /// </summary>
+        public void ShowAt(Control parent, Point location)
+        {
+            this.Location = location;
+            this.Visible = true;
+            this.BringToFront();
         }
     }
 }
